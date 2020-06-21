@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fetch API Sandbox</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container mt-3">
+		<h1 class="display-4 mb-4">Fetch API Sandbox </h1>
+		<div class="d-flex mb-4">
+			<button id="getText" class="btn btn-primary mr-3"> Get Text </button>
+			<button id="getUsers" class="btn btn-success mr-3"> Get JSON </button>
+			<button id="getPosts" class="btn btn-warning mr-3"> Get API Data </button>
+			<button id="getContestList" class="btn btn-info"> Get Decayed's CF Contest List</button>
+		</div>
+
+		<div id="output" class="mb-4"></div><hr>
+
+		<form id="contestList" class="mb-4">
+			<h1 class="mt-4 mb-4">Get Your Contest List</h1>
+			<div class="form-group">
+				<input id="username" type="text" placeholder="CF Username" class="form-control">
+			</div>
+			<input id="submit" type="submit" value="Fetch Contest List" class="btn btn-secondary">
+		</form>
+		<div id="contestListOutput" class="mb-4"></div>
+
+		<form id="rankList" class="mb-4">
+			<h1 class="mt-4 mb-4">Organization Rank List Based on Contest Count </h1>
+			<div class="form-group">
+				<input id="organization" type="text" placeholder="Organization" class="form-control">
+			</div>
+			<input id="submit" type="submit" value="Fetch Rank List" class="btn btn-secondary">
+		</form>
+		<div id="rankListOutput" class="mb-4"></div>
+		<hr>
+
+		<form id="addPost" class="mb-4">
+			<h1 class="mt-4 mb-4">Add New Post</h1>
+			<div class="form-group">
+				<input id="title" type="text" placeholder="Title" class="form-control">
+			</div>
+			<div class="form-group">
+				<textarea id="body" placeholder="Body" class="form-control" rows="10"></textarea>
+			</div>
+			<input id="submit" type="submit" value="Add Post" class="btn btn-secondary">
+		</form>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="script.js"></script>
+</body>
+</html>
