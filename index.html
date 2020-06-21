@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fetch API Sandbox</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container mt-3">
+		<h1 class="display-4 mb-4">Fetch API Sandbox </h1>
+		<div class="d-flex mb-4">
+			<button id="getText" class="btn btn-primary mr-3"> Get Text </button>
+			<button id="getUsers" class="btn btn-success mr-3"> Get JSON </button>
+			<button id="getPosts" class="btn btn-warning mr-3"> Get API Data </button>
+			<button id="getContestList" class="btn btn-info"> Get Decayed's CF Contest List</button>
+		</div>
+
+		<div id="output" class="mb-4"></div><hr>
+
+		<form id="contestList" class="mb-4">
+			<h1 class="mt-4 mb-4">Get Your Contest List</h1>
+			<div class="form-group">
+				<input id="username" type="text" placeholder="CF Username" class="form-control">
+			</div>
+			<input id="submit" type="submit" value="Fetch Contest List" class="btn btn-secondary">
+		</form>
+		<div id="contestListOutput" class="mb-4"></div>
+
+		<form id="rankList" class="mb-4">
+			<h1 class="mt-4 mb-4">Organization Rank List Based on Contest Count </h1>
+			<div class="form-group">
+				<input id="organization" type="text" placeholder="Organization" class="form-control">
+			</div>
+			<input id="submit" type="submit" value="Fetch Rank List" class="btn btn-secondary">
+		</form>
+		<div id="rankListOutput" class="mb-4"></div>
+		<hr>
+
+		<form id="addPost" class="mb-4">
+			<h1 class="mt-4 mb-4">Add New Post</h1>
+			<div class="form-group">
+				<input id="title" type="text" placeholder="Title" class="form-control">
+			</div>
+			<div class="form-group">
+				<textarea id="body" placeholder="Body" class="form-control" rows="10"></textarea>
+			</div>
+			<input id="submit" type="submit" value="Add Post" class="btn btn-secondary">
+		</form>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+
+		$('#getText').on('click', getText);
+		$('#getUsers').on('click', getUsers);
+		$('#getPosts').on('click', getPosts);
+		$('#getContestList').on('click', getContestList);
+		$('#addPost').on('submit', addPost)
+		$('#contestList').on('submit', userContestList)
+		$('#rankList').on('submit', organizationRankList)
+
+
+		function getText(){
+			fetch('info.txt')
+			.then((res) => res.text())
+			.then((data) => {
+				$('#output').html(data);
+			})
+			.catch((error) => console.log(error))
+		}
+
+		function getUsers(){
+			fetch('users.json')
+			.then((res) => res.json())
+			.then((data) => {
+				let output = "<h3 class='mb-4'> Users </h3>";
+				data.forEach(user => {
+					output += `
+						<ul class="list-group mb-3">
+							<li class="list-group-item" > ID: ${user.id} </li>
+							<li class="list-group-item" > Name: ${user.name} </li>
+							<li class="list-group-item" > Email: ${user.email} </li>
+						</ul>
+						`
+				});
+				$('#output').html(output);
+			})
+		}
+
+		function getPosts(){
+			fetch("https://jsonplaceholder.typicode.com/posts")
+			.then((res) => res.json())
+			.then((data) => {
+				let output = "<h3 class='mb-4'> Posts </h3>";
+				data.forEach(post => {
+					output += `
+						<div class="card card-body mb-2">
+							<h3> ${post.title} </h3>
+							<p> ${post.body} </p>
+						</div>
+						`
+				})
+				$('#output').html(output);
+			})
+		}
+
+		function addPost(event){
+			event.preventDefault();
+
+			fetch("https://jsonplaceholder.typicode.com/posts", {
+				method: "POST",
+				headers: {
+					'Accept': 'application/json, text/plain, */*',
+					'Content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					title: $('#title').val(),
+					body: $('#body').val(),
+				}),
+			})
+			.then((res) => res.json())
+			.then((post) => {
+				console.log(post)
+				let output = "<h3 class='mb-4'> New Post </h3>";
+				output += `
+					<div class="card card-body mb-2">
+						<h3> Title: ${post.title} </h3>
+						<p> Body: ${post.body} </p>
+						<p> ID: ${post.id} </p>
+					</div>
+					`
+				$('#output').html(output);
+				$('#title').val("");
+				$('#body').val("");
+			})
+		}
+
+		function getContestList(){
+			fetch("https://codeforces.com/api/user.rating?handle=Decayed")
+			.then((res) => res.json())
+			.then((data) => {
+				data = data["result"];
+				let output = "<h3 class='mb-4 text-center'> Decayed's Contest List </h3>";
+				output += `
+					<table class="table table-striped text-center mb-4">
+						<tr>
+							<td> # </td>
+							<td> Name </td>
+							<td> Rank </td>
+							<td> Rating Change </td>
+							<td> New Rating </td>
+						</tr>
+					`
+				data.reverse();
+				let total = data.length
+				data.forEach((contest, index) => {
+					output += `
+						<tr>
+							<td> ${total-index} </td>
+							<td> ${contest.contestName} </td>
+							<td> ${contest.rank}  </td>
+							<td> ${contest.newRating - (contest.oldRating > 0 ? contest.oldRating : 1500)}  </td>
+							<td> ${contest.newRating}  </td>
+						</tr>
+						`
+				})
+				output += "</table>"
+				$('#output').html(output);
+			})
+		}
+
+		function max(a, b){
+			return (a > b) ? a : b;
+		}
+		function min(a, b){
+			return (a < b) ? a : b;
+		}
+
+		function userContestList(event){
+			event.preventDefault()
+
+			let username = $('#username').val();
+			let url = "https://codeforces.com/api/user.rating?handle="+username;
+
+			fetch(url)
+			.then((res) => res.json())
+			.then((data) => {
+				data = data["result"];
+				let output = `<h3 class='mb-4 text-center'> ${username}'s Contest List </h3>`;
+				data.reverse();
+				let total = data.length
+				let maxRatingIncrease = 0;
+				let maxRatingDecrease = 0;
+				let bestRank = 1e9;
+				let worstRank = 0;
+				let currentRating = 0;
+				let maxRating = 0;
+				let lowestRating = 1e9;
+				if(total)
+					currentRating = data[0].newRating;
+
+				data.forEach(contest => {
+					let ratingChange = contest.newRating - (contest.oldRating > 0 ? contest.oldRating : 1500);
+					if(ratingChange > 0)
+						maxRatingIncrease = max(maxRatingIncrease, ratingChange);
+					else
+						maxRatingDecrease = min(maxRatingDecrease, ratingChange);
+					bestRank = min(bestRank, contest.rank);
+					worstRank = max(worstRank, contest.rank);
+					maxRating = max(maxRating, contest.newRating);
+					lowestRating = min(lowestRating, contest.newRating);
+				})
+
+				output += `
+					<div class="card text-center mb-4">
+						<div class="card-header"> Contest Summary </div>
+						<div class="card-body">
+							<strong> Total Contests : ${total} </strong> <br>
+							<strong> Current Rating : ${currentRating} </strong> <br>
+							<strong> Max Rating : ${maxRating} </strong> <br>
+							<strong> Lowest Rating : ${lowestRating} </strong> <br>
+							<strong> Best Rank : ${bestRank} </strong> <br>
+							<strong> Worst Rank : ${worstRank} </strong> <br>
+							<strong> Max Rating Increase : +${maxRatingIncrease} </strong> <br>
+							<strong> Max Rating Decrease : ${maxRatingDecrease} </strong> 
+						</div>
+						<div class="card-footer"></div>
+					</div>
+					`
+
+				output += `
+					<table class="table table-striped text-center mb-4">
+						<tr>
+							<td> # </td>
+							<td> Name </td>
+							<td> Rank </td>
+							<td> Rating Change </td>
+							<td> New Rating </td>
+						</tr>
+					`
+				data.forEach((contest, index) => {
+					let ratingChange = contest.newRating - (contest.oldRating > 0 ? contest.oldRating : 1500);
+					let sign = (ratingChange >= 0) ? '+' : '';
+
+					output += `
+						<tr>
+							<td> ${total-index} </td>
+							<td> ${contest.contestName} </td>
+							<td> ${contest.rank}  </td>
+							<td> ${sign + ratingChange}  </td>
+							<td> ${contest.newRating}  </td>
+						</tr>
+						`
+				})
+				output += "</table>"
+				$('#contestListOutput').html(output);
+			})
+			.catch((error) => {
+				console.log(error);
+				$('#contestListOutput').html("No Such User Exists!!");
+			})
+		}
+
+		function organizationRankList(event){
+			event.preventDefault()
+
+			let organization = $('#organization').val();
+			$('#rankListOutput').html("Not Implemented Yet!!");
+		}
+	</script>
+</body>
+</html>
